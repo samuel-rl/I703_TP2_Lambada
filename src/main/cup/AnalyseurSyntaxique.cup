@@ -1,0 +1,94 @@
+/* package et imports */
+package fr.usmb.m1isc.compilation.tp;
+import java_cup.runtime.Symbol;
+import java.util.HashMap;
+
+import fr.usmb.m1isc.compilation.tp.Arbre;
+import fr.usmb.m1isc.compilation.tp.Arbre.NodeType;
+
+/* inclusion du code */
+
+action code {: 
+    // pour utilisation dans les actions (classe action)
+	// HashMap pour la gestion des variables
+	private HashMap<String,Integer> vars = new HashMap<>();
+	// gestion des erreurs d'evaluation
+	private boolean erreur = false;
+:};
+
+ 
+parser code {:
+    // pour le parser (redefinition de la methode reportant les erreurs d'analyse)
+  public void report_error(String message, Object info) {
+ 	String m = "";
+ 	if (info instanceof java_cup.runtime.Symbol) {
+ 	    Symbol s = ((Symbol) info); 	
+ 		if (s != null && s.left >= 0 ) {
+ 			/* Ajoute le numero de ligne  et de colonne*/
+ 			m =  "Ligne " + (s.left+1) + ", Colonne " + (s.right+1) + " : ";
+ 			}
+ 		}
+ 	m = m + message;
+    System.err.println(m);
+    }
+:};
+
+ init with {:
+    //	initialisation du parser
+:};
+
+/* symboles terminaux */
+terminal PLUS, MOINS, MOINS_UNAIRE, MUL, DIV, MOD, NOT, OR, AND, PAR_G, PAR_D, SEMI, POINT, LET, INPUT, OUTPUT, IF, THEN, ELSE, WHILE, DO, EGAL, GT, GTE, NIL, ERROR, VARIABLE;
+terminal Integer ENTIER;
+terminal String IDENT;
+
+/* non terminaux */
+non terminal Arbre program, sequence, expression, expr;
+
+precedence nonassoc OUTPUT;
+precedence right OR;
+precedence right AND;
+precedence right NOT;
+precedence nonassoc EGAL;
+precedence nonassoc GT, GTE;
+precedence left PLUS, MOINS;
+precedence left MUL, DIV, MOD;
+precedence left MOINS_UNAIRE;
+
+/* grammaire */
+// un programme est une sequence d'insctuctions terminee par un point
+// On affiche ici l'arbre parce que j'y arrive pas dans le main
+program ::= sequence:s {: RESULT=s; System.out.println(s.toString()); :} POINT
+	      ;
+
+// une sequence est une suite d'instructions separes par des point virgules	
+sequence ::= expression:e1 SEMI sequence:e2     {: RESULT = new Arbre(NodeType.SEMI, ";", e1, e2); :}
+	 	   | expression:e1 SEMI                 {: RESULT=e1; :}
+	 	   ;
+
+//
+expression ::= expr:e {: RESULT = e; :}
+             | LET IDENT:ident EGAL expr:e {: RESULT = new Arbre(NodeType.LET, "let", new Arbre(NodeType.IDENT, ident), e); :}				
+             | error // reprise d'erreurs
+			 ;
+
+// 
+expr ::= NOT:op expr:e                     {: RESULT = new Arbre(NodeType.NOT, "not", e); :}
+	   | expr:e1 AND expr:e2               {: RESULT = new Arbre(NodeType.AND, "and", e1, e2); :}
+	   | expr:e1 OR expr:e2                {: RESULT = new Arbre(NodeType.OR, "or", e1, e2); :}
+	   | expr:e1 EGAL expr:e2              {: RESULT = new Arbre(NodeType.EGAL, "==", e1, e2); :}
+	   | expr:e1 GT expr:e2                {: RESULT = new Arbre(NodeType.GT, ">", e1, e2); :}
+	   | expr:e1 GTE expr:e2               {: RESULT = new Arbre(NodeType.GTE, ">=", e1, e2); :}
+	   | expr:e1 PLUS:x expr:e2            {: RESULT = new Arbre(NodeType.PLUS, "+", e1, e2); :}
+	   | expr:e1 MOINS expr:e2             {: RESULT = new Arbre(NodeType.MOINS, "-", e1, e2); :}
+	   | expr:e1 MUL expr:e2               {: RESULT = new Arbre(NodeType.MUL, "*", e1, e2); :}
+	   | expr:e1 DIV expr:e2               {: RESULT = new Arbre(NodeType.DIV, "/", e1, e2); :}
+	   | expr:e1 MOD expr:e2               {: RESULT = new Arbre(NodeType.MOD, "%", e1, e2); :}
+	   | MOINS expr:e                      {: RESULT = new Arbre(NodeType.MOINS_UNAIRE, "-", e); :}			 %prec MOINS_UNAIRE 
+	   | OUTPUT expr:e                     {: RESULT = new Arbre(NodeType.OUTPUT, "output", e); :}
+	   | INPUT                             {: RESULT = new Arbre(NodeType.INPUT, "input"); :}
+	   | NIL                               {: RESULT = new Arbre(NodeType.NIL, "nil"); :}
+	   | ENTIER:n                          {: RESULT = new Arbre(NodeType.ENTIER, n.toString()); :}
+	   | IDENT:id                          {: RESULT = new Arbre(NodeType.IDENT, id); :}
+	   | PAR_G sequence:e PAR_D            {: RESULT = e; :}
+	   ;
