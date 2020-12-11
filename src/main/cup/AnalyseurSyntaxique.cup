@@ -38,7 +38,7 @@ parser code {:
 :};
 
 /* symboles terminaux */
-terminal PLUS, MOINS, MOINS_UNAIRE, MUL, DIV, MOD, NOT, OR, AND, PAR_G, PAR_D, SEMI, POINT, LET, INPUT, OUTPUT, IF, THEN, ELSE, WHILE, DO, EGAL, GT, GTE, NIL, ERROR, VARIABLE;
+terminal PLUS, MOINS, MOINS_UNAIRE, MUL, DIV, MOD, NOT, OR, AND, PAR_G, PAR_D, SEMI, POINT, LET, INPUT, OUTPUT, IF, THEN, ELSE, WHILE, DO, EGAL, GT, GTE, NIL, ERROR; 
 terminal Integer ENTIER;
 terminal String IDENT;
 
@@ -63,7 +63,8 @@ program ::= sequence:s {: RESULT=s; System.out.println(s.toString()); :} POINT
 
 // une sequence est une suite d'instructions separes par des point virgules	
 sequence ::= expression:e1 SEMI sequence:e2     {: RESULT = new Arbre(NodeType.SEMI, ";", e1, e2); :}
-	 	   | expression:e1 SEMI                 {: RESULT=e1; :}
+	 	   | expression:e1                      {: RESULT=e1; :}
+	 	   |                                    {: RESULT = null; :}
 	 	   ;
 
 //
@@ -89,6 +90,6 @@ expr ::= NOT:op expr:e                     {: RESULT = new Arbre(NodeType.NOT, "
 	   | INPUT                             {: RESULT = new Arbre(NodeType.INPUT, "input"); :}
 	   | NIL                               {: RESULT = new Arbre(NodeType.NIL, "nil"); :}
 	   | ENTIER:n                          {: RESULT = new Arbre(NodeType.ENTIER, n.toString()); :}
-	   | IDENT:id                          {: RESULT = new Arbre(NodeType.IDENT, id); :}
+	   | IDENT:ident                       {: RESULT = new Arbre(NodeType.IDENT, ident); :}
 	   | PAR_G sequence:e PAR_D            {: RESULT = e; :}
 	   ;
