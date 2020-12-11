@@ -58,18 +58,20 @@ precedence left MOINS_UNAIRE;
 /* grammaire */
 // un programme est une sequence d'insctuctions terminee par un point
 // On affiche ici l'arbre parce que j'y arrive pas dans le main
-program ::= sequence:s {: RESULT=s; System.out.println(s.toString()); :} POINT
+program ::= sequence:s {: RESULT=s; :} POINT
 	      ;
 
 // une sequence est une suite d'instructions separes par des point virgules	
-sequence ::= expression:e1 SEMI sequence:e2     {: RESULT = new Arbre(NodeType.SEMI, ";", e1, e2); :}
-	 	   | expression:e1                      {: RESULT=e1; :}
-	 	   |                                    {: RESULT = null; :}
+sequence ::= expression:e1 SEMI sequence:e2                           {: RESULT = new Arbre(NodeType.SEMI, ";", e1, e2); :}
+	 	   | expression:e1                                            {: RESULT=e1; :}
+	 	   |                                                          {: RESULT = null; :} 
 	 	   ;
 
 //
 expression ::= expr:e {: RESULT = e; :}
-             | LET IDENT:ident EGAL expr:e {: RESULT = new Arbre(NodeType.LET, "let", new Arbre(NodeType.IDENT, ident), e); :}				
+             | LET IDENT:ident EGAL expr:e {: RESULT = new Arbre(NodeType.LET, "let", new Arbre(NodeType.IDENT, ident), e); :}			
+             | WHILE expr:cond DO expression:e                          {: RESULT = new Arbre(NodeType.WHILE, "while", cond, new Arbre(NodeType.DO, "do", e, null)); :}
+             | IF expr:cond THEN expression:a1 ELSE expression:a2       {: RESULT = new Arbre(NodeType.IF, "if", cond, new Arbre(NodeType.THEN, "then", a1, new Arbre(NodeType.ELSE, "else", a2, null))); :}	
              | error // reprise d'erreurs
 			 ;
 
