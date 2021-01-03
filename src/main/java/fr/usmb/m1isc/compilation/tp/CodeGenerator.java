@@ -122,7 +122,7 @@ public class CodeGenerator {
     			res.append("debut_while_" + tempId + ":\n");
     			res.append(codeToString(arbre.getArbreGauche()));
     			res.append("\tjz sortie_while_" + tempId + "\n");
-    			res.append(codeToString(arbre.getArbreDroit()));
+    			res.append(codeToString(arbre.getArbreDroit().getArbreGauche()));
     			res.append("\tjmp debut_while_" + tempId + "\n");
     			res.append("sortie_while_" + tempId + ":\n");
     			break;
@@ -141,7 +141,7 @@ public class CodeGenerator {
                 res.append(codeToString(arbre.getArbreGauche()));
                 res.append("\tjz sortie_and_" + tempId + "\n");
                 res.append(codeToString(arbre.getArbreDroit()));
-                res.append("\tsortie_and_" + tempId + ":\n");
+                res.append("sortie_and_" + tempId + ":\n");
                 break;
             case OR:
                 tempId = getNewId();
@@ -160,19 +160,19 @@ public class CodeGenerator {
                 res.append("\tjnz faux_eq_" + tempId + "\n");
                 res.append("\tmov eax, 1\n");
                 res.append("\tjmp sortie_eq" + tempId + "\n");
-                res.append("\tfaux_eq_" + tempId + ":\n");
+                res.append("faux_eq_" + tempId + ":\n");
                 res.append("\tmov eax, 0\n");
                 res.append("sortie_eq" + tempId + ":\n");
                 break;
             case NOT:
                 tempId = getNewId();
                	res.append(codeToString(arbre.getArbreGauche()));
-                res.append("\tjz true_not_" + tempId + "\n");
+                res.append("\tjz vrai_not_" + tempId + "\n");
                 res.append("\tmov eax, 0\n");
                 res.append("\tjmp sortie_not_" + tempId + "\n");
-                res.append("\ttrue_not_" + tempId + ":\n");
+                res.append("vrai_not_" + tempId + ":\n");
                 res.append("\tmov eax, 1\n");
-                res.append("\tsortie_not_" + tempId + ":\n");
+                res.append("sortie_not_" + tempId + ":\n");
                 break;
             case GT:
                 tempId = getNewId();
@@ -181,10 +181,10 @@ public class CodeGenerator {
                 res.append(codeToString(arbre.getArbreDroit()));
                 res.append("\tpop ebx\n");
                 res.append("\tsub eax, ebx\n");
-                res.append("\tjle false_gt_" + tempId + "\n"); 
+                res.append("\tjle faux_gt_" + tempId + "\n"); 
                 res.append("\tmov eax, 1\n");
                 res.append("\tjmp sortie_gt_" + tempId + "\n");
-                res.append("\tfalse_gt_" + tempId + ":\n");
+                res.append("faux_gt_" + tempId + ":\n");
                 res.append("\tmov eax, 0\n");
                 res.append("sortie_gt_" + tempId + ":\n");
                 break;
@@ -195,12 +195,12 @@ public class CodeGenerator {
                 res.append(codeToString(arbre.getArbreDroit()));
                 res.append("\tpop ebx\n");
                 res.append("\tsub eax, ebx\n");
-                res.append("\tjl false_gteq_" + tempId + "\n");
+                res.append("\tjl faux_gteq_" + tempId + "\n");
                 res.append("\tmov eax, 1\n");
                 res.append("\tjmp sortie_gteq" + tempId + "\n");
-                res.append("\tfalse_gteq_" + tempId + ":\n");
+                res.append("faux_gteq_" + tempId + ":\n");
                 res.append("\tmov eax, 0\n");
-                res.append("\tsortie_gteq" + tempId + ":\n");
+                res.append("sortie_gteq" + tempId + ":\n");
                 break;
             case INPUT:
             	res.append("\tin eax\n");

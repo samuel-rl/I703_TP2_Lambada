@@ -13,9 +13,8 @@ public class Main {
 		        yy = new LexicalAnalyzer(new InputStreamReader(System.in)) ;
 		@SuppressWarnings("deprecation")
 		parser p = new parser (yy);
-		
 		Arbre arbre = (Arbre) p.parse().value;
-		
+		System.out.println(arbre.toString());	
 		CodeGenerator cg = new CodeGenerator(arbre);
 		System.out.println(cg.toString());
 		cg.saveToAsmFile("test");
