@@ -80,8 +80,8 @@ expr ::= NOT:op expr:e                     {: RESULT = new Arbre(NodeType.NOT, "
 	   | expr:e1 AND expr:e2               {: RESULT = new Arbre(NodeType.AND, "and", e1, e2); :}
 	   | expr:e1 OR expr:e2                {: RESULT = new Arbre(NodeType.OR, "or", e1, e2); :}
 	   | expr:e1 EGAL expr:e2              {: RESULT = new Arbre(NodeType.EGAL, "==", e1, e2); :}
-	   | expr:e1 GT expr:e2                {: RESULT = new Arbre(NodeType.GT, ">", e1, e2); :}
-	   | expr:e1 GTE expr:e2               {: RESULT = new Arbre(NodeType.GTE, ">=", e1, e2); :}
+	   | expr:e1 GT expr:e2                {: RESULT = new Arbre(NodeType.GT, "<", e1, e2); :}
+	   | expr:e1 GTE expr:e2               {: RESULT = new Arbre(NodeType.GTE, "<=", e1, e2); :}
 	   | expr:e1 PLUS:x expr:e2            {: RESULT = new Arbre(NodeType.PLUS, "+", e1, e2); :}
 	   | expr:e1 MOINS expr:e2             {: RESULT = new Arbre(NodeType.MOINS, "-", e1, e2); :}
 	   | expr:e1 MUL expr:e2               {: RESULT = new Arbre(NodeType.MUL, "*", e1, e2); :}
